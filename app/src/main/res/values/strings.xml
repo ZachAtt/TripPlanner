@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Trip Planner</string>
+
+    <string name="city1">Find Select a City!</string>
+    <string name="city2">Find Select a City!</string>
+    <string name="city3">Find Select a City!</string>
+
+    <string name="car">Car</string>
+    <string name="plane">Plane</string>
+    <string name="bus">Bus</string>
+    <string name="train">Train</string>
+
+
+</resources>
+
+
+
