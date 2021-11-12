@@ -10,7 +10,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TripPlanner">
         <activity
-            android:name=".Trip"
+            android:name=".Direction"
+            android:exported="true" />
+        <activity
+            android:name=".DestinationViewer"
+            android:exported="true" />
+        <activity
+            android:name=".DestinationEditor"
+            android:exported="true" />
+        <activity
+            android:name=".TripViewer"
+            android:exported="true" />
+        <activity
+            android:name=".TripEditor"
             android:exported="true" />
         <activity
             android:name=".MainActivity"

@@ -1,18 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".TripEditor">
 
-    <TextView
+     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="24dp"
         android:backgroundTint="@color/design_default_color_secondary"
-        android:text="Where do you want to go?"
+        android:text="selected destination from main activity screen to do"
         android:textColorLink="#03A9F4"
         android:textSize="20dp"
         android:textStyle="bold" />
@@ -22,8 +23,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:entries="@array/options" />
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -69,7 +68,7 @@
             android:text="Delete" />
 
         <Button
-            android:id="@+id/btn_view"
+            android:id="@+id/btn_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
@@ -78,7 +77,8 @@
             android:layout_gravity="bottom"
             android:background="@drawable/circle_button"
             android:textSize="12dp"
-            android:text="View" />
+            android:text="Cancel" />
 
     </LinearLayout>
 </LinearLayout>
+
