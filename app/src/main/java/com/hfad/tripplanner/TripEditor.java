@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -17,8 +18,8 @@ import android.widget.Toast;
 
 public class TripEditor extends AppCompatActivity {
     public static final String TRIP_ID = "tripId";
-    private SQLiteDatabase db;
-    private Cursor cursor;
+    int selectedDestination = 0;
+    int selectedTrip = 0;
     Button button;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +50,7 @@ public class TripEditor extends AppCompatActivity {
          }
       });
 
-        int tripId = (Integer)getIntent().getExtras().get(TRIP_ID);
-
+        selectedTrip = (Integer)getIntent().getExtras().get(TRIP_ID);
         ListView listDestinations = (ListView) findViewById(R.id.List_options);
         SQLiteOpenHelper tripDatabaseHelper = new TripDatabaseHelper(this);
         try{
@@ -58,7 +58,7 @@ public class TripEditor extends AppCompatActivity {
             Cursor cursor = db.query("DESTINATION",
                     new String[] {"_id" ,"CITY"},
                     "TRIP_ID = ?",
-                    new String[] {Integer.toString(tripId)},
+                    new String[] {Integer.toString(selectedTrip)},
                     null, null, null);
 
             SimpleCursorAdapter listAdapter = new SimpleCursorAdapter(this,
@@ -69,26 +69,17 @@ public class TripEditor extends AppCompatActivity {
                     0);
             listDestinations.setAdapter(listAdapter);
 
-                    /*
-            if(cursor.moveToFirst()){
-                String cityText = cursor.getString(0);
-
-                TextView name = (TextView) findViewById(R.id.name);
-                name.setText(cityText);
-
-                TextView description = (TextView)findViewById(R.id.description);
-                description.setText(descriptionText);
-
-                ImageView photo = (ImageView) findViewById(R.id.photo);
-                photo.setImageResource(photoId);
-                photo.setContentDescription(cityText);
-            }
-
-
-            cursor.close();
-            db.close();
-
-                     */
+            AdapterView.OnItemClickListener itemClickListener =
+                    new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> listDestinations,
+                                                View itemView,
+                                                int position,
+                                                long id) {
+                            selectedDestination = (int) id;
+                        }
+                    };
+            listDestinations.setOnItemClickListener(itemClickListener);
         } catch (SQLiteException e){
             Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
             toast.show();
@@ -97,11 +88,12 @@ public class TripEditor extends AppCompatActivity {
     
     public void openDestinationEditor(){
         Intent intent = new Intent(this, DestinationEditor.class);
+        intent.putExtra(DestinationEditor.TRIP_ID, selectedTrip);
+        intent.putExtra(DestinationEditor.DESTINATION_ID, selectedDestination);
         startActivity(intent);
     }
     public void goBackToMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-
     }
 }

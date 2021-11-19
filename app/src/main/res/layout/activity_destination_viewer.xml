@@ -7,16 +7,59 @@
     android:orientation="vertical"
     tools:context=".DestinationViewer">
 
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginLeft="10dp"
-    android:layout_marginTop="20dp"
-    android:backgroundTint="@color/design_default_color_secondary"
-    android:text="TO DO..DestinationViewer..."
-    android:textColorLink="#03A9F4"
-    android:textSize="20dp"
-    android:textStyle="bold" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:text="City: "/>
+        <TextView
+            android:id="@+id/City"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:background="@android:drawable/editbox_background"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:text="Latitude: "/>
+        <TextView
+            android:id="@+id/Latitude"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:background="@android:drawable/editbox_background"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:text="Longitude: "/>
+        <TextView
+            android:id="@+id/Longitude"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:background="@android:drawable/editbox_background"/>
+    </LinearLayout>
 
     <LinearLayout
 
