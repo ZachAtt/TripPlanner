@@ -106,12 +106,14 @@
             android:textStyle="bold"
             android:text="to do Distance"/>
         <TextView
+            android:id="@+id/distance_miles"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:textSize="20dp"
             android:textStyle="bold"
             android:text="____miles"/>
         <TextView
+            android:id="@+id/distance_kilometers"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:textSize="20dp"
