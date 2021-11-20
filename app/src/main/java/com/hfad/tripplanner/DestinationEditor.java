@@ -16,10 +16,14 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.ParseException;
+
 public class DestinationEditor extends AppCompatActivity {
 
     Button button;
     int selectedTrip = 0;
+    TripDatabaseHelper tripDatabaseHelper;
+    Destination destination;
     public static final String TRIP_ID = "tripId";
     public static final String DESTINATION_ID = "destinationId";
 
@@ -40,6 +44,7 @@ public class DestinationEditor extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                doSave();
                 backtoTripEditor();
             }
         });
@@ -49,44 +54,38 @@ public class DestinationEditor extends AppCompatActivity {
         EditText lonEdit = (EditText) findViewById(R.id.Longitude);
         int destinationId = (Integer)getIntent().getExtras().get(DESTINATION_ID);
         selectedTrip = (Integer)getIntent().getExtras().get(TRIP_ID);
-        cityEdit.setText(String.valueOf(destinationId));
 
-        SQLiteOpenHelper tripDatabaseHelper = new TripDatabaseHelper(this);
+        tripDatabaseHelper = new TripDatabaseHelper(this);
+
         try{
-            SQLiteDatabase db = tripDatabaseHelper.getReadableDatabase();
-            Cursor cursor = db.query("DESTINATION",
-                    new String[] {"CITY", "LAT", "LONG"},
-                    "_id = ?",
-                    new String[] {Integer.toString(destinationId)},
-                    null, null, null);
-
-            if(cursor.moveToFirst()){
-                String cityText = cursor.getString(0);
-                double lat = cursor.getDouble(1);
-                double lon = cursor.getDouble(2);
-
-                cityEdit.setText(cityText);
-                latEdit.setText(String.valueOf(lat));
-                lonEdit.setText(String.valueOf(lon));
-            }
-
-
-            cursor.close();
-            db.close();
-
-
-        } catch (SQLiteException e){
-            Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
+            destination = tripDatabaseHelper.getDestination(destinationId);
+        }catch (ParseException e){
+            Toast toast = Toast.makeText(this, "Could not get destination", Toast.LENGTH_SHORT);
             toast.show();
         }
+
+
+        cityEdit.setText(destination.getCity());
+        latEdit.setText(String.valueOf(destination.getLat()));
+        lonEdit.setText(String.valueOf(destination.getLon()));
     }
-
-
 
     public void backtoTripEditor(){
         Intent intent = new Intent(this, TripEditor.class);
         intent.putExtra(TripViewer.TRIP_ID, selectedTrip);
         startActivity(intent);
+    }
+
+    public void doSave(){
+        EditText cityEdit = (EditText) findViewById(R.id.City);
+        EditText latEdit = (EditText) findViewById(R.id.Latitude);
+        EditText lonEdit = (EditText) findViewById(R.id.Longitude);
+
+        destination.setCity(cityEdit.getText().toString());
+        destination.setLat(Double.parseDouble(latEdit.getText().toString()));
+        destination.setLon(Double.parseDouble(lonEdit.getText().toString()));
+
+        tripDatabaseHelper.updateDestination(destination);
     }
 
     /*

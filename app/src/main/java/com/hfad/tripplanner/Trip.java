@@ -1,26 +1,32 @@
 package com.hfad.tripplanner;
 
-import androidx.appcompat.app.AppCompatActivity;
+public class Trip {
+    private int id;
+    private String name;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.widget.TextView;
+    public Trip(){
+        setId(0);
+        setName("");
+    }
 
-public class Trip extends AppCompatActivity {
+    public Trip(int id, String name){
+        setId(id);
+        setName(name);
+    }
 
-    TextView receiver_msg;
-    @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trip);
+    public String getName() {
+        return name;
+    }
 
-        receiver_msg = (TextView)findViewById(R.id.received_value_id);
+    public void setName(String name) {
+        this.name = name;
+    }
 
-                Intent intent = getIntent();
+    public int getId() {
+        return id;
+    }
 
-                String str = intent.getStringExtra("message_key");
-
-        receiver_msg.setText("Ready to plan for your " + str + " trip?");
+    public void setId(int id) {
+        this.id = id;
     }
 }
