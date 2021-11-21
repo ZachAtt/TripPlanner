@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 public class TripViewer extends AppCompatActivity {
     public static final String TRIP_ID = "tripId";
-    int selectedDestination = 0;
+    int selectedDestination = -1;
     int selectedTrip = 0;
     Button button;
     @Override
@@ -25,24 +25,8 @@ public class TripViewer extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_viewer);
 
-        button = (Button) findViewById(R.id.btn_back);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                backToMainActivity();
-            }
-        });
-
-        button = (Button) findViewById(R.id.btn_view);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openDestinationViewer();
-            }
-        });
-
         selectedTrip = (Integer)getIntent().getExtras().get(TRIP_ID);
-
+        boolean haveItems = false;
         ListView listDestinations = (ListView) findViewById(R.id.List_options);
         SQLiteOpenHelper tripDatabaseHelper = new TripDatabaseHelper(this);
         try{
@@ -52,7 +36,6 @@ public class TripViewer extends AppCompatActivity {
                     "TRIP_ID = ?",
                     new String[] {Integer.toString(selectedTrip)},
                     null, null, null);
-
             SimpleCursorAdapter listAdapter = new SimpleCursorAdapter(this,
                     android.R.layout.simple_list_item_1,
                     cursor,
@@ -72,9 +55,30 @@ public class TripViewer extends AppCompatActivity {
                         }
                     };
             listDestinations.setOnItemClickListener(itemClickListener);
+            haveItems = cursor.getCount() > 0;
         } catch (SQLiteException e){
             Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
             toast.show();
+        }
+
+        button = (Button) findViewById(R.id.btn_back);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                backToMainActivity();
+            }
+        });
+
+        if(haveItems){
+            button = (Button) findViewById(R.id.btn_view);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(selectedDestination >= 0){
+                        openDestinationViewer();
+                    }
+                }
+            });
         }
     }
 

@@ -3,6 +3,8 @@ package com.hfad.tripplanner;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -17,7 +19,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private SQLiteDatabase db;
-    int selectedTrip = 0;
+    int selectedTrip = -1;
     private Cursor cursor;
     Button button;
 
@@ -26,40 +28,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        button = (Button) findViewById(R.id.btn_add);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openTripActivity();
-            }
-        });
-
-        button = (Button) findViewById(R.id.btn_update);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openTripActivity();
-            }
-        });
-
-        button = (Button) findViewById(R.id.btn_delete);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openTripActivity();
-            }
-        });
-
-        button = (Button) findViewById(R.id.btn_view);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openTripViewer();
-            }
-        });
-
         ListView listTrips = (ListView) findViewById(R.id.List_options);
-        SQLiteOpenHelper tripDatabaseHelper = new TripDatabaseHelper(this);
+        TripDatabaseHelper tripDatabaseHelper = new TripDatabaseHelper(this);
+        boolean haveItems = false;
         try{
             db = tripDatabaseHelper.getReadableDatabase();
             cursor = db.query("TRIP",
@@ -94,9 +65,50 @@ public class MainActivity extends AppCompatActivity {
                         }
                     };
             listTrips.setOnItemClickListener(itemClickListener);
+            haveItems = cursor.getCount() > 0;
         } catch (SQLiteException e){
             Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
             toast.show();
+        }
+
+        button = (Button) findViewById(R.id.btn_add);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openTripActivity();
+            }
+        });
+
+        if(haveItems){
+            button = (Button) findViewById(R.id.btn_update);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(selectedTrip >= 0){
+                        openTripActivity();
+                    }
+                }
+            });
+
+            button = (Button) findViewById(R.id.btn_delete);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(selectedTrip >= 0){
+                       deleteTrip();
+                    }
+                }
+            });
+
+            button = (Button) findViewById(R.id.btn_view);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(selectedTrip >= 0){
+                        openTripViewer();
+                    }
+                }
+            });
         }
     }
     public void openTripActivity(){
@@ -108,5 +120,33 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, TripViewer.class);
         intent.putExtra(TripViewer.TRIP_ID, selectedTrip);
         startActivity(intent);
+    }
+    public void deleteTrip(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle("Confirm Delete Trip");
+        builder.setMessage("Are you sure you want to delete this trip? All data for this trip will" +
+                "be deleted and cannot be recovered");
+        builder.setPositiveButton("Confirm",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        doDelete();
+                    }
+                });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int x = 1;
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    public void doDelete(){
+        TripDatabaseHelper tripDatabaseHelper = new TripDatabaseHelper(this);
+        tripDatabaseHelper.deleteTrip(selectedTrip);
     }
 }

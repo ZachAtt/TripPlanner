@@ -56,6 +56,10 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
         db.insert("TRIP", null, tripValues);
     }
 
+    public void deleteTrip(int id){
+        db.delete("TRIP", "_id=?", new String[]{String.valueOf(id)});
+    }
+
     public Trip getTrip(int id){
         Trip trip = new Trip();
         SQLiteDatabase db = getReadableDatabase();
@@ -132,6 +136,10 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
     public void updateDestination(Destination destination){
         ContentValues destinationValues = getContentValues(destination);
         db.update("DESTINATION", destinationValues, "_id=?", new String[]{String.valueOf(destination.getId())});
+    }
+
+    public void deleteDestination(int id){
+        db.delete("DESTINATION", "_id=?", new String[]{String.valueOf(id)});
     }
 
     public Destination getDestination(int id) throws ParseException{
