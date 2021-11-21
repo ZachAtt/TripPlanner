@@ -56,6 +56,26 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
         db.insert("TRIP", null, tripValues);
     }
 
+    public Trip getTrip(int id){
+        Trip trip = new Trip();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query("TRIP",
+                new String[] {"NAME"},
+                "_id = ?",
+                new String[] {Integer.toString(id)},
+                null, null, null);
+
+        trip.setId(id);
+        if(cursor.moveToFirst()){
+            trip.setName(cursor.getString(0));
+        }
+
+        cursor.close();
+        db.close();
+
+        return trip;
+    }
+
     private ContentValues getContentValues(Destination destination){
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
         String arrivalDateText = dateFormat.format(destination.getArrivalDate());
