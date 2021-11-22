@@ -179,6 +179,18 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
         return destination;
     }
 
+    private ContentValues getContentValues(Journal journal){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        String dateText = dateFormat.format(journal.getDate());
+        ContentValues journalValues = new ContentValues();
+        journalValues.put("DESTINATION_ID", journal.getDestinationId());
+        journalValues.put("TRIP_ID", journal.getTripId());
+        journalValues.put("DATE", dateText);
+        journalValues.put("ENTRY", journal.getEntry());
+
+        return journalValues;
+    }
+
     private void insertJournal(int destinationId, int tripId, Date date,
                                       String entry){
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -190,6 +202,45 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
         journalValues.put("DATE", dateText);
         journalValues.put("ENTRY", entry);
         db.insert("JOURNAL", null, journalValues);
+    }
+
+    public void insertJournal(Journal journal){
+        ContentValues journalValues = getContentValues(journal);
+        db.insert("JOURNAL", null,  journalValues);
+    }
+
+    public void updateJournal(Journal journal){
+        ContentValues journalValues = getContentValues(journal);
+        db.update("JOURNAL", journalValues, "_id=?", new String[]{String.valueOf(journal.getId())});
+    }
+
+    public void deleteJournal(int id){
+        db.delete("JOURNAL", "_id=?", new String[]{String.valueOf(id)});
+    }
+
+    public Journal getJournal(int id) throws ParseException{
+        Journal journal = new Journal();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query("JOURNAL",
+                new String[] {"DESTINATION_ID", "TRIP_ID", "DATE", "ENTRY"},
+                "_id = ?",
+                new String[] {Integer.toString(id)},
+                null, null, null);
+
+        journal.setId(id);
+        if(cursor.moveToFirst()){
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+
+            journal.setDestinationId(cursor.getInt(0));
+            journal.setTripId(cursor.getInt(1));
+            journal.setDate(dateFormat.parse(cursor.getString(2)));
+            journal.setEntry(cursor.getString(3));
+        }
+
+        cursor.close();
+        db.close();
+
+        return journal;
     }
 
     private void insertMultimedia(int destinationId, int tripId,
