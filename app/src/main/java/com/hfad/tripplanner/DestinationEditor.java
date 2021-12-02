@@ -21,7 +21,9 @@ import java.text.ParseException;
 public class DestinationEditor extends AppCompatActivity {
 
     Button button;
-    int selectedTrip = 0;
+    int selectedTrip = -1;
+    int selectedDestination = -1;
+    int selectedJournal= -1;
     TripDatabaseHelper tripDatabaseHelper;
     Destination destination;
     public static final String TRIP_ID = "tripId";
@@ -46,6 +48,16 @@ public class DestinationEditor extends AppCompatActivity {
             public void onClick(View v) {
                 doSave();
                 backtoTripEditor();
+            }
+        });
+
+        button = (Button) findViewById(R.id.btn_note);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectedTrip >= 0) {
+                    openNoteEditor();
+                }
             }
         });
 
@@ -76,6 +88,7 @@ public class DestinationEditor extends AppCompatActivity {
         startActivity(intent);
     }
 
+
     public void doSave(){
         EditText cityEdit = (EditText) findViewById(R.id.City);
         EditText latEdit = (EditText) findViewById(R.id.Latitude);
@@ -87,6 +100,15 @@ public class DestinationEditor extends AppCompatActivity {
 
         tripDatabaseHelper.updateDestination(destination);
     }
+
+    public void openNoteEditor(){
+        Intent intent = new Intent(this, NoteEditor.class);
+        intent.putExtra(NoteEditor.TRIP_ID, selectedTrip);
+        intent.putExtra(NoteEditor.DESTINATION_ID, selectedDestination);
+        intent.putExtra(NoteEditor.JOURNAL_ID, selectedJournal);
+        startActivity(intent);
+    }
+
 
     /*
             if(cursor.moveToFirst()){
