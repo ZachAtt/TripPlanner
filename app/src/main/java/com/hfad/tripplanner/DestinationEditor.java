@@ -23,7 +23,6 @@ public class DestinationEditor extends AppCompatActivity {
     Button button;
     int selectedTrip = -1;
     int selectedDestination = -1;
-    int selectedJournal= -1;
     TripDatabaseHelper tripDatabaseHelper;
     Destination destination;
     public static final String TRIP_ID = "tripId";
@@ -105,7 +104,7 @@ public class DestinationEditor extends AppCompatActivity {
         Intent intent = new Intent(this, NoteEditor.class);
         intent.putExtra(NoteEditor.TRIP_ID, selectedTrip);
         intent.putExtra(NoteEditor.DESTINATION_ID, selectedDestination);
-        intent.putExtra(NoteEditor.JOURNAL_ID, selectedJournal);
+        intent.putExtra(NoteEditor.OPENED_BY, NoteEditor.DESTINATION_EDITOR);
         startActivity(intent);
     }
 
