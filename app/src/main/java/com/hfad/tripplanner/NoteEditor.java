@@ -122,22 +122,62 @@ public class NoteEditor extends AppCompatActivity {
 
         startActivity(intent);
     }
+    public void deleteJournal(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle("Confirm Delete note");
+        builder.setMessage("Are you sure you want to delete this note? All data for this" +
+                " note will be deleted and cannot be recovered");
+        builder.setPositiveButton("Confirm",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        doDelete();
+                    }
+                });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int x = 1;
+            }
+        });
+    
 
     public void doSave(){
        //call DatabaseHelper to save contents of note text edit to database for selected note
         //No need to start new activity, just stay in this one
         //Update the note lsit to update the entry for the edited note
+        
+        EditText cityEdit = (EditText) findViewById(R.id.City);
+        EditText dateEdit = (EditText) findViewById(R.id.date);
+        EditText entryEdit = (EditText) findViewById(R.id.entry);
+
+        journal.setDestinationId(Integer.parseInt(cityEdit.getText().toString()));
+        journal.setDate(Date.valueOf(dateEdit.getText().toString()));
+        journal.setEntry(entryEdit.getText().toString());
+        tripDatabaseHelper.updateJournal(journal);
     }
 
     public void doDelete(){
         //call DatabaseHelper to selected note
         //No need to start new activity, just stay in this one
         //Update the note list to remove the deleted note
+        TripDatabaseHelper tripDatabaseHelper = new TripDatabaseHelper(this);
+        tripDatabaseHelper.deleteJournal(selectedJournal);
     }
 
     public void doAdd(){
         //call DatabaseHelper to save contents of note text edit to database as a new note
         //No need to start new activity, just stay in this one
         //Update note list with new note and make it the selected note
+        
+         EditText cityEdit = (EditText) findViewById(R.id.City);
+        EditText dateEdit = (EditText) findViewById(R.id.date);
+        EditText entryEdit = (EditText) findViewById(R.id.entry);
+
+        journal.setDestinationId(Integer.parseInt(cityEdit.getText().toString()));
+        journal.setDate(Date.valueOf(dateEdit.getText().toString()));
+        journal.setEntry(entryEdit.getText().toString());
+        tripDatabaseHelper.updateJournal(journal);
     }
 }
