@@ -17,6 +17,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,12 +26,17 @@ import com.example.easywaylocation.EasyWayLocation;
 import com.example.easywaylocation.Listener;
 
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 public class DestinationViewer extends AppCompatActivity implements Listener {
     Button button;
     int selectedTrip = 0;
     public static final String TRIP_ID = "tripId";
     public static final String DESTINATION_ID = "destinationId";
+    
+    Destination destination;
+    TripDatabaseHelper tripDatabaseHelper;
 
     //    Location variables....
     EasyWayLocation easyWayLocation;
@@ -61,40 +68,47 @@ public class DestinationViewer extends AppCompatActivity implements Listener {
         });
 
         TextView cityEdit = (TextView) findViewById(R.id.City);
+        TextView stateEdit = (TextView) findViewById(R.id.State);
+        TextView countryEdit = (TextView) findViewById(R.id.Country);
         TextView latEdit = (TextView) findViewById(R.id.Latitude);
         TextView lonEdit = (TextView) findViewById(R.id.Longitude);
+        TextView arrivalDateEdit = (TextView) findViewById(R.id.Arrival_Date);
+        TextView departureDateEdit = (TextView) findViewById(R.id.Departure_Date);
+        TextView travelTypeEdit = (TextView) findViewById(R.id.Travel_type);
+        TextView travelNumberEdit = (TextView) findViewById(R.id.Travel_number);
+        TextView travelUrlEdit = (TextView) findViewById(R.id.Travel_url);
+        TextView lodgingNumberEdit = (TextView) findViewById(R.id.Lodging_number);
+        TextView lodgingUrlEdit = (TextView) findViewById(R.id.Lodging_url);
+        
         int destinationId = (Integer)getIntent().getExtras().get(DESTINATION_ID);
         selectedTrip = (Integer)getIntent().getExtras().get(TRIP_ID);
         cityEdit.setText(String.valueOf(destinationId));
 
-        SQLiteOpenHelper tripDatabaseHelper = new TripDatabaseHelper(this);
+        tripDatabaseHelper = new TripDatabaseHelper(this);
+
         try{
-            SQLiteDatabase db = tripDatabaseHelper.getReadableDatabase();
-            Cursor cursor = db.query("DESTINATION",
-                    new String[] {"CITY", "LAT", "LONG"},
-                    "_id = ?",
-                    new String[] {Integer.toString(destinationId)},
-                    null, null, null);
-
-            if(cursor.moveToFirst()){
-                String cityText = cursor.getString(0);
-                destLat = cursor.getDouble(1);
-                destLon = cursor.getDouble(2);
-
-                cityEdit.setText(cityText);
-                latEdit.setText(String.valueOf(destLat));
-                lonEdit.setText(String.valueOf(destLon));
-            }
-
-
-            cursor.close();
-            db.close();
-
-
-        } catch (SQLiteException e){
+            destination = tripDatabaseHelper.getDestination(destinationId);
+        } catch (ParseException e){
             Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
             toast.show();
         }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        String arrivalDateText = dateFormat.format(destination.getArrivalDate());
+        String departureDateText = dateFormat.format(destination.getDepartureDate());
+
+        cityEdit.setText(destination.getCity());
+        stateEdit.setText(destination.getState());
+        countryEdit.setText(destination.getCountry());
+        latEdit.setText(String.valueOf(destination.getLat()));
+        lonEdit.setText(String.valueOf(destination.getLon()));
+        arrivalDateEdit.setText(arrivalDateText);
+        departureDateEdit.setText(departureDateText);
+        travelTypeEdit.setText(destination.getTravelType());
+        travelNumberEdit.setText(String.valueOf(destination.getTravelNumber()));
+        travelUrlEdit.setText(destination.getTravelUrl());
+        lodgingNumberEdit.setText(String.valueOf(destination.getLodgingNumber()));
+        lodgingUrlEdit.setText(destination.getLodgingUrl());
 
         easyWayLocation = new EasyWayLocation(this, false, false, this);
         if (isPermissionGranted()) {

@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 public class DestinationEditor extends AppCompatActivity {
 
@@ -61,8 +62,17 @@ public class DestinationEditor extends AppCompatActivity {
         });
 
         EditText cityEdit = (EditText) findViewById(R.id.City);
+        EditText stateEdit = (EditText) findViewById(R.id.State);
+        EditText countryEdit = (EditText) findViewById(R.id.Country);
         EditText latEdit = (EditText) findViewById(R.id.Latitude);
         EditText lonEdit = (EditText) findViewById(R.id.Longitude);
+        EditText arrivalDateEdit = (EditText) findViewById(R.id.Arrival_Date);
+        EditText departureDateEdit = (EditText) findViewById(R.id.Departure_Date);
+        EditText travelTypeEdit = (EditText) findViewById(R.id.Travel_type);
+        EditText travelNumberEdit = (EditText) findViewById(R.id.Travel_number);
+        EditText travelUrlEdit = (EditText) findViewById(R.id.Travel_url);
+        EditText lodgingNumberEdit = (EditText) findViewById(R.id.Lodging_number);
+        EditText lodgingUrlEdit = (EditText) findViewById(R.id.Lodging_url);
         int destinationId = (Integer)getIntent().getExtras().get(DESTINATION_ID);
         selectedTrip = (Integer)getIntent().getExtras().get(TRIP_ID);
 
@@ -74,11 +84,29 @@ public class DestinationEditor extends AppCompatActivity {
             Toast toast = Toast.makeText(this, "Could not get destination", Toast.LENGTH_SHORT);
             toast.show();
         }
-
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        String arrivalDateText = dateFormat.format(destination.getArrivalDate());
+        String departureDateText = dateFormat.format(destination.getDepartureDate());
 
         cityEdit.setText(destination.getCity());
+        stateEdit.setText(destination.getState());
+        countryEdit.setText(destination.getCountry());
         latEdit.setText(String.valueOf(destination.getLat()));
         lonEdit.setText(String.valueOf(destination.getLon()));
+        arrivalDateEdit.setText(arrivalDateText);
+        departureDateEdit.setText(departureDateText);
+        travelTypeEdit.setText(destination.getTravelType());
+        travelNumberEdit.setText(String.valueOf(destination.getTravelNumber()));
+        travelUrlEdit.setText(destination.getTravelUrl());
+        lodgingNumberEdit.setText(String.valueOf(destination.getLodgingNumber()));
+        lodgingUrlEdit.setText(destination.getLodgingUrl());
+
+        /*
+        (int tripId, String city, String state, String country,
+                                          double lat, double lon, Date arrivalDate, Date departureDate,
+                                          int nextDestination, String travelType, int travelNumber,
+                                          String travelUrl, int lodgingNumber, String lodgingUrl)
+         */
     }
 
     public void backtoTripEditor(){
