@@ -2,16 +2,19 @@ package com.hfad.tripplanner;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
+import android.content.*;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import java.util.*;
+import android.app.AlertDialog;
 
 public class NoteEditor extends AppCompatActivity {
     Button button;
@@ -122,7 +125,7 @@ public class NoteEditor extends AppCompatActivity {
 
         startActivity(intent);
     }
-    public void deleteJournal(){
+    public void deleteJournal() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(true);
         builder.setTitle("Confirm Delete note");
@@ -141,6 +144,7 @@ public class NoteEditor extends AppCompatActivity {
                 int x = 1;
             }
         });
+    }
     
 
     public void doSave(){
@@ -152,8 +156,18 @@ public class NoteEditor extends AppCompatActivity {
         EditText dateEdit = (EditText) findViewById(R.id.date);
         EditText entryEdit = (EditText) findViewById(R.id.entry);
 
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        Date date;
+        try {
+            date = sdf.parse(dateEdit.getText().toString());
+            journal.setDate(date);
+        }catch (ParseException e){
+            //Do nothing, keep existing date value
+            //Add a popup error dialog
+        }
+
+
         journal.setDestinationId(Integer.parseInt(cityEdit.getText().toString()));
-        journal.setDate(Date.valueOf(dateEdit.getText().toString()));
         journal.setEntry(entryEdit.getText().toString());
         tripDatabaseHelper.updateJournal(journal);
     }
@@ -175,8 +189,17 @@ public class NoteEditor extends AppCompatActivity {
         EditText dateEdit = (EditText) findViewById(R.id.date);
         EditText entryEdit = (EditText) findViewById(R.id.entry);
 
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        Date date;
+        try {
+            date = sdf.parse(dateEdit.getText().toString());
+            journal.setDate(date);
+        }catch (ParseException e){
+            //Do nothing, keep existing date value
+            //Add a popup error dialog
+        }
+
         journal.setDestinationId(Integer.parseInt(cityEdit.getText().toString()));
-        journal.setDate(Date.valueOf(dateEdit.getText().toString()));
         journal.setEntry(entryEdit.getText().toString());
         tripDatabaseHelper.updateJournal(journal);
     }
