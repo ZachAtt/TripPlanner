@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TripPlanner">
         <activity
+            android:name=".NoteViewer"
+            android:exported="false" />
+        <activity
             android:name=".NoteEditor"
             android:exported="true" />
         <activity

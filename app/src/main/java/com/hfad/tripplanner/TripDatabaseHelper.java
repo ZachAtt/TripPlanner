@@ -6,19 +6,23 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import java.text.ParseException;
-import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class TripDatabaseHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "tripPlanner";
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 3;
     private SQLiteDatabase db;
 
     TripDatabaseHelper(Context context){
         super(context, DB_NAME, null, DB_VERSION);
+        db = getWritableDatabase();
     }
 
     @Override
@@ -38,6 +42,28 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
         tripValues.put("NAME", trip.getName());
 
         return tripValues;
+    }
+
+    public ArrayList<Trip> getTripList(){
+        ArrayList<Trip> list = new ArrayList<Trip>();
+        try{
+            Cursor cursor = db.query("TRIP",
+                    new String[]{"_id", "NAME"},
+                    null, null, null, null, null);
+            if(cursor.getCount() > 0){
+                cursor.moveToFirst();
+                do{
+                    Trip trip = new Trip();
+                    trip.setId(cursor.getInt(0));
+                    trip.setName(cursor.getString(1));
+                }while (cursor.moveToNext());
+            }
+        } catch (SQLiteException e){
+            //Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
+            //toast.show();
+        }
+
+        return list;
     }
 
     public void insertTrip(Trip trip){
@@ -179,70 +205,6 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
         return destination;
     }
 
-    private ContentValues getContentValues(Journal journal){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        String dateText = dateFormat.format(journal.getDate());
-        ContentValues journalValues = new ContentValues();
-        journalValues.put("DESTINATION_ID", journal.getDestinationId());
-        journalValues.put("TRIP_ID", journal.getTripId());
-        journalValues.put("DATE", dateText);
-        journalValues.put("ENTRY", journal.getEntry());
-
-        return journalValues;
-    }
-
-    private void insertJournal(int destinationId, int tripId, Date date,
-                                      String entry){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        String dateText = dateFormat.format(date);
-
-        ContentValues journalValues = new ContentValues();
-        journalValues.put("DESTINATION_ID", destinationId);
-        journalValues.put("TRIP_ID", tripId);
-        journalValues.put("DATE", dateText);
-        journalValues.put("ENTRY", entry);
-        db.insert("JOURNAL", null, journalValues);
-    }
-
-    public void insertJournal(Journal journal){
-        ContentValues journalValues = getContentValues(journal);
-        db.insert("JOURNAL", null,  journalValues);
-    }
-
-    public void updateJournal(Journal journal){
-        ContentValues journalValues = getContentValues(journal);
-        db.update("JOURNAL", journalValues, "_id=?", new String[]{String.valueOf(journal.getId())});
-    }
-
-    public void deleteJournal(int id){
-        db.delete("JOURNAL", "_id=?", new String[]{String.valueOf(id)});
-    }
-
-    public Journal getJournal(int id) throws ParseException{
-        Journal journal = new Journal();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query("JOURNAL",
-                new String[] {"DESTINATION_ID", "TRIP_ID", "DATE", "ENTRY"},
-                "_id = ?",
-                new String[] {Integer.toString(id)},
-                null, null, null);
-
-        journal.setId(id);
-        if(cursor.moveToFirst()){
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-
-            journal.setDestinationId(cursor.getInt(0));
-            journal.setTripId(cursor.getInt(1));
-            journal.setDate(dateFormat.parse(cursor.getString(2)));
-            journal.setEntry(cursor.getString(3));
-        }
-
-        cursor.close();
-        db.close();
-
-        return journal;
-    }
-
     private void insertMultimedia(int destinationId, int tripId,
                                          String fileName, Date date, String note){
         ContentValues dataValues = new ContentValues();
@@ -270,6 +232,42 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
         db.insert("ACTIVITY", null, activityValues);
     }
 
+    public long insertNote(int destinationId, String note) {
+        //SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("DESTINATION_ID", destinationId);
+        contentValues.put("NOTE", note);
+        return db.insert("NOTE", null, contentValues);
+    }
+
+    public void deleteNote(int noteId) {
+        //SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("NOTE", "_id=?", new String[]{String.valueOf(noteId)});
+    }
+
+    public void updateNote(int noteId, String note) {
+        //SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("NOTE", note);
+        db.update("NOTE", contentValues, "_id=?", new String[]{String.valueOf(noteId)});
+    }
+
+    public List<Note> getAllNotes(int destinationId) {
+        //SQLiteDatabase db = this.getReadableDatabase();
+        List<Note> noteList = new ArrayList<>();
+        Cursor cursor = db.rawQuery("SELECT _id, DESTINATION_ID, NOTE FROM NOTE where DESTINATION_ID =?",
+                new String[]{Integer.toString(destinationId)});
+
+        if (cursor.getCount() != 0) {
+            while (cursor.moveToNext()) {
+                Note note = new Note(cursor.getInt(0), cursor.getInt(1), cursor.getString(2));
+                noteList.add(note);
+            }
+        }
+        cursor.close();
+        return noteList;
+    }
+
    private void updateMyDatabase(int oldVersion, int newVersion){
         if(oldVersion < 1){
             db.execSQL("CREATE TABLE TRIP (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -289,6 +287,7 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
                     "TRAVEL_URL TEXT, " +
                     "LODGING_NUMBER INTEGER, " +
                     "LODGING_URL TEXT);");
+
 
             insertTrip("Ski Trip");
             insertTrip("Gambling Trip");
@@ -330,12 +329,6 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
                     "HOURS DOUBLE, " +
                     "DATE TEXT);");
         }
-            insertJournal(1, 1, new Date(), "Starting our trip");
-            insertJournal(1, 2, new Date(), "Stuffed ourselves at Mile High Pancake House");
-            insertJournal(1, 3, new Date(), "Enjoying the mountains");
-            insertJournal(2, 4, new Date(), "Starting our trip");
-            insertJournal(2, 5, new Date(), "Lady luck is with us. WINNING!");
-            insertJournal(3, 6, new Date(), "Starting our trip");
 
             insertMultimedia(1, 1, "Image1", new Date(), "Starting our trip");
             insertMultimedia(1, 2, "Image2", new Date(), "I can see for miles");
@@ -349,5 +342,21 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
             insertActivity(7, "Casino", "Gambling", "Entertainment", 200.00, 3, new Date());
             insertActivity(10, "Disney World", "Enjoy the rides", "Theme Park", 250.00, 10, new Date());
         //}
+
+       if (oldVersion < 3){
+           db.execSQL("DROP TABLE JOURNAL");
+
+           db.execSQL("CREATE TABLE NOTE (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                   "DESTINATION_ID INTEGER, " +
+                   "NOTE TEXT);");
+
+           insertNote(1, "Starting our trip");
+           insertNote(2, "Stuffed ourselves at Mile High Pancake House");
+           insertNote(3, "Enjoying the mountains");
+           insertNote(6, "Starting our trip");
+           insertNote(7, "Lady luck is with us. WINNING!");
+           insertNote(9, "Starting our trip");
+       }
+
     }
 }

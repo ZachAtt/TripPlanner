@@ -106,7 +106,6 @@ public class TripEditor extends AppCompatActivity {
     
     public void openDestinationEditor(){
         Intent intent = new Intent(this, DestinationEditor.class);
-        intent.putExtra(DestinationEditor.TRIP_ID, selectedTrip);
         intent.putExtra(DestinationEditor.DESTINATION_ID, selectedDestination);
         startActivity(intent);
     }

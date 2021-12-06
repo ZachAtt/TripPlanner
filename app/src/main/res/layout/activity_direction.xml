@@ -13,7 +13,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="20dp"
         android:backgroundTint="@color/design_default_color_secondary"
-        android:text="TO DO..Direction..and map."
+        android:text="Direction and Destination"
         android:textColorLink="#03A9F4"
         android:textSize="20dp"
         android:textStyle="bold" />

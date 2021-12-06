@@ -66,7 +66,7 @@ public class Direction extends AppCompatActivity implements OnMapReadyCallback, 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
-        LatLng currentLatLng = new LatLng(39.000000,-80.500000);
+        LatLng currentLatLng = new LatLng(currentLat, currentLng);
         LatLng destLatLng = new LatLng(destLat, destLng);
         mMap.addMarker(new MarkerOptions()
                 .position(currentLatLng)
@@ -75,7 +75,7 @@ public class Direction extends AppCompatActivity implements OnMapReadyCallback, 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         builder.include(currentLatLng);
         builder.include(destLatLng);
-        int padding = 10; // offset from edges of the map in pixels
+        int padding = 10;
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(builder.build(), padding);
         mMap.animateCamera(cu);
         wayPoints.add(currentLatLng);

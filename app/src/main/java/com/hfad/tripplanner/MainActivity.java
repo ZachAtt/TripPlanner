@@ -13,15 +13,20 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private SQLiteDatabase db;
+    TripDatabaseHelper tripDatabaseHelper;
     int selectedTrip = -1;
     private Cursor cursor;
-    Button button;
+    Button addButton;
+    Button updateButton;
+    Button deleteButton;
+    Button viewButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ListView listTrips = (ListView) findViewById(R.id.List_options);
-        TripDatabaseHelper tripDatabaseHelper = new TripDatabaseHelper(this);
+        tripDatabaseHelper = new TripDatabaseHelper(this);
         boolean haveItems = false;
         try{
             db = tripDatabaseHelper.getReadableDatabase();
@@ -71,27 +76,27 @@ public class MainActivity extends AppCompatActivity {
             toast.show();
         }
 
-        button = (Button) findViewById(R.id.btn_add);
-        button.setOnClickListener(new View.OnClickListener() {
+        addButton = (Button) findViewById(R.id.btn_add);
+        addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openTripActivity();
+                addTrip();
             }
         });
 
-        if(haveItems){
-            button = (Button) findViewById(R.id.btn_update);
-            button.setOnClickListener(new View.OnClickListener() {
+
+        updateButton = (Button) findViewById(R.id.btn_update);
+        updateButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(selectedTrip >= 0){
-                        openTripActivity();
+                    openTripEditor();
                     }
                 }
             });
 
-            button = (Button) findViewById(R.id.btn_delete);
-            button.setOnClickListener(new View.OnClickListener() {
+        deleteButton = (Button) findViewById(R.id.btn_delete);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(selectedTrip >= 0){
@@ -100,8 +105,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            button = (Button) findViewById(R.id.btn_view);
-            button.setOnClickListener(new View.OnClickListener() {
+        viewButton = (Button) findViewById(R.id.btn_view);
+        viewButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(selectedTrip >= 0){
@@ -109,9 +114,24 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
+
+        updateButton.setEnabled(haveItems);
+        deleteButton.setEnabled(haveItems);
+        viewButton.setEnabled(haveItems);
+    }
+
+    public void addTrip(){
+        EditText tripEdit = (EditText) findViewById(R.id.newTrip);
+
+        if(tripEdit.getText().length() > 0){
+            Trip trip = new Trip();
+            trip.setName(tripEdit.getText().toString());
+            tripDatabaseHelper.insertTrip(trip);
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
         }
     }
-    public void openTripActivity(){
+    public void openTripEditor(){
         Intent intent = new Intent(this, TripEditor.class);
         intent.putExtra(TripEditor.TRIP_ID, selectedTrip);
         startActivity(intent);
@@ -146,7 +166,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void doDelete(){
-        TripDatabaseHelper tripDatabaseHelper = new TripDatabaseHelper(this);
         tripDatabaseHelper.deleteTrip(selectedTrip);
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 }

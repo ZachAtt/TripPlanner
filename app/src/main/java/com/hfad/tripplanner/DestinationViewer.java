@@ -31,7 +31,8 @@ import java.text.SimpleDateFormat;
 
 public class DestinationViewer extends AppCompatActivity implements Listener {
     Button button;
-    int selectedTrip = 0;
+    int selectedTrip = -1;
+    int destinationId = -1;
     public static final String TRIP_ID = "tripId";
     public static final String DESTINATION_ID = "destinationId";
     
@@ -41,13 +42,17 @@ public class DestinationViewer extends AppCompatActivity implements Listener {
     //    Location variables....
     EasyWayLocation easyWayLocation;
     private double destLat, destLon;
-
+    private double currentLat, currentLng;
+    private String cityName = "";
     private TextView textViewMiles, textViewKilometer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_destination_viewer);
+
+        selectedTrip = (Integer)getIntent().getExtras().get(TRIP_ID);
+        destinationId = (Integer)getIntent().getExtras().get(DESTINATION_ID);
 
         button = (Button) findViewById(R.id.btn_ok);
         textViewMiles = findViewById(R.id.distance_miles);
@@ -56,6 +61,14 @@ public class DestinationViewer extends AppCompatActivity implements Listener {
             @Override
             public void onClick(View v) {
                 backToTripViewer();
+            }
+        });
+
+        button = (Button) findViewById(R.id.btn_note);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openNoteViewer();
             }
         });
 
@@ -79,10 +92,6 @@ public class DestinationViewer extends AppCompatActivity implements Listener {
         TextView travelUrlEdit = (TextView) findViewById(R.id.Travel_url);
         TextView lodgingNumberEdit = (TextView) findViewById(R.id.Lodging_number);
         TextView lodgingUrlEdit = (TextView) findViewById(R.id.Lodging_url);
-        
-        int destinationId = (Integer)getIntent().getExtras().get(DESTINATION_ID);
-        selectedTrip = (Integer)getIntent().getExtras().get(TRIP_ID);
-        cityEdit.setText(String.valueOf(destinationId));
 
         tripDatabaseHelper = new TripDatabaseHelper(this);
 
@@ -97,6 +106,7 @@ public class DestinationViewer extends AppCompatActivity implements Listener {
         String arrivalDateText = dateFormat.format(destination.getArrivalDate());
         String departureDateText = dateFormat.format(destination.getDepartureDate());
 
+        cityName = destination.getCity();
         cityEdit.setText(destination.getCity());
         stateEdit.setText(destination.getState());
         countryEdit.setText(destination.getCountry());
@@ -143,8 +153,19 @@ public class DestinationViewer extends AppCompatActivity implements Listener {
         startActivity(intent);
     }
 
+    public void openNoteViewer(){
+        Intent intent = new Intent(this, NoteViewer.class);
+        intent.putExtra(NoteViewer.DESTINATION_ID, destinationId);
+        startActivity(intent);
+    }
+
     public void openDirectionViewer() {
         Intent intent = new Intent(this, Direction.class);
+        intent.putExtra("current_lat", currentLat);
+        intent.putExtra("current_lng", currentLng);
+        intent.putExtra("dest_lat", destLat);
+        intent.putExtra("dest_lng", destLon);
+        intent.putExtra("dest_name", cityName);
         startActivity(intent);
     }
 
@@ -155,14 +176,14 @@ public class DestinationViewer extends AppCompatActivity implements Listener {
 
     @Override
     public void currentLocation(Location location) {
-        double lati = location.getLatitude();
-        double longi = location.getLongitude();
+        currentLat = location.getLatitude();
+        currentLng = location.getLongitude();
         easyWayLocation.endUpdates();
 
         if (destLat != 0.0 && destLon != 0.0) {
             Location currentLocation = new Location("currentLocation");
-            currentLocation.setLatitude(lati);
-            currentLocation.setLongitude(longi);
+            currentLocation.setLatitude(currentLat);
+            currentLocation.setLongitude(currentLng);
 
             Location destinationLocation = new Location("destinationLocation");
             destinationLocation.setLatitude(destLat);
