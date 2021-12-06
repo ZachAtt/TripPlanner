@@ -45,6 +45,7 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<Trip> getTripList(){
+        db = getWritableDatabase();
         ArrayList<Trip> list = new ArrayList<Trip>();
         try{
             Cursor cursor = db.query("TRIP",
@@ -67,26 +68,31 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void insertTrip(Trip trip){
+        db = getWritableDatabase();
         ContentValues tripValues = getContentValues(trip);
         db.insert("TRIP", null, tripValues);
     }
 
     public void updateTrip(Trip trip){
+        db = getWritableDatabase();
         ContentValues tripValues = getContentValues(trip);
         db.update("TRIP", tripValues, "_id=?", new String[]{String.valueOf(trip.getId())});
     }
 
     private void insertTrip(String name){
+        db = getWritableDatabase();
         ContentValues tripValues = new ContentValues();
         tripValues.put("NAME", name);
         db.insert("TRIP", null, tripValues);
     }
 
     public void deleteTrip(int id){
+        db = getWritableDatabase();
         db.delete("TRIP", "_id=?", new String[]{String.valueOf(id)});
     }
 
     public Trip getTrip(int id){
+        db = getWritableDatabase();
         Trip trip = new Trip();
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query("TRIP",
@@ -133,6 +139,7 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
                                           double lat, double lon, Date arrivalDate, Date departureDate,
                                           int nextDestination, String travelType, int travelNumber,
                                           String travelUrl, int lodgingNumber, String lodgingUrl){
+        db = getWritableDatabase();
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
         String arrivalDateText = dateFormat.format(arrivalDate);
         String departureDateText = dateFormat.format(departureDate);
@@ -155,20 +162,24 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void insertDestination(Destination destination){
+        db = getWritableDatabase();
         ContentValues destinationValues = getContentValues(destination);
         db.insert("DESTINATION", null,  destinationValues);
     }
 
     public void updateDestination(Destination destination){
+        db = getWritableDatabase();
         ContentValues destinationValues = getContentValues(destination);
         db.update("DESTINATION", destinationValues, "_id=?", new String[]{String.valueOf(destination.getId())});
     }
 
     public void deleteDestination(int id){
+        db = getWritableDatabase();
         db.delete("DESTINATION", "_id=?", new String[]{String.valueOf(id)});
     }
 
     public Destination getDestination(int id) throws ParseException{
+        db = getWritableDatabase();
         Destination destination = new Destination();
             SQLiteDatabase db = getReadableDatabase();
             Cursor cursor = db.query("DESTINATION",
@@ -207,6 +218,7 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
 
     private void insertMultimedia(int destinationId, int tripId,
                                          String fileName, Date date, String note){
+        db = getWritableDatabase();
         ContentValues dataValues = new ContentValues();
         dataValues.put("DESTINATION_ID", destinationId);
         dataValues.put("TRIP_ID", tripId);
@@ -219,6 +231,7 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
     public void insertActivity(int destinationId, String name,
                                        String description, String category, double cost,
                                        double hours, Date date){
+        db = getWritableDatabase();
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
         String dateText = dateFormat.format(date);
         ContentValues activityValues = new ContentValues();
@@ -233,6 +246,7 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public long insertNote(int destinationId, String note) {
+        db = getWritableDatabase();
         //SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("DESTINATION_ID", destinationId);
@@ -241,11 +255,13 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void deleteNote(int noteId) {
+        db = getWritableDatabase();
         //SQLiteDatabase db = this.getWritableDatabase();
         db.delete("NOTE", "_id=?", new String[]{String.valueOf(noteId)});
     }
 
     public void updateNote(int noteId, String note) {
+        db = getWritableDatabase();
         //SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("NOTE", note);
@@ -253,6 +269,7 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public List<Note> getAllNotes(int destinationId) {
+        db = getWritableDatabase();
         //SQLiteDatabase db = this.getReadableDatabase();
         List<Note> noteList = new ArrayList<>();
         Cursor cursor = db.rawQuery("SELECT _id, DESTINATION_ID, NOTE FROM NOTE where DESTINATION_ID =?",
@@ -269,6 +286,7 @@ public class TripDatabaseHelper extends SQLiteOpenHelper {
     }
 
    private void updateMyDatabase(int oldVersion, int newVersion){
+       db = getWritableDatabase();
         if(oldVersion < 1){
             db.execSQL("CREATE TABLE TRIP (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "NAME TEXT);");

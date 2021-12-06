@@ -120,13 +120,15 @@ public class DestinationViewer extends AppCompatActivity implements Listener {
         lodgingNumberEdit.setText(String.valueOf(destination.getLodgingNumber()));
         lodgingUrlEdit.setText(destination.getLodgingUrl());
 
+        destLat = destination.getLat();
+        destLon = destination.getLon();
+
         easyWayLocation = new EasyWayLocation(this, false, false, this);
         if (isPermissionGranted()) {
             easyWayLocation.startLocation();
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 100);
         }
-
     }
 
     private boolean isPermissionGranted() {

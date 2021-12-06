@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class DestinationEditor extends AppCompatActivity {
 
@@ -19,6 +20,19 @@ public class DestinationEditor extends AppCompatActivity {
     Destination destination;
     int destinationId = -1;
     public static final String DESTINATION_ID = "destinationId";
+
+    EditText cityEdit;
+    EditText stateEdit;
+    EditText countryEdit;
+    EditText latEdit;
+    EditText lonEdit;
+    EditText arrivalDateEdit;
+    EditText departureDateEdit;
+    EditText travelTypeEdit;
+    EditText travelNumberEdit;
+    EditText travelUrlEdit;
+    EditText lodgingNumberEdit;
+    EditText lodgingUrlEdit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,18 +66,18 @@ public class DestinationEditor extends AppCompatActivity {
             }
         });
 
-        EditText cityEdit = (EditText) findViewById(R.id.City);
-        EditText stateEdit = (EditText) findViewById(R.id.State);
-        EditText countryEdit = (EditText) findViewById(R.id.Country);
-        EditText latEdit = (EditText) findViewById(R.id.Latitude);
-        EditText lonEdit = (EditText) findViewById(R.id.Longitude);
-        EditText arrivalDateEdit = (EditText) findViewById(R.id.Arrival_Date);
-        EditText departureDateEdit = (EditText) findViewById(R.id.Departure_Date);
-        EditText travelTypeEdit = (EditText) findViewById(R.id.Travel_type);
-        EditText travelNumberEdit = (EditText) findViewById(R.id.Travel_number);
-        EditText travelUrlEdit = (EditText) findViewById(R.id.Travel_url);
-        EditText lodgingNumberEdit = (EditText) findViewById(R.id.Lodging_number);
-        EditText lodgingUrlEdit = (EditText) findViewById(R.id.Lodging_url);
+        cityEdit = (EditText) findViewById(R.id.City);
+        stateEdit = (EditText) findViewById(R.id.State);
+        countryEdit = (EditText) findViewById(R.id.Country);
+        latEdit = (EditText) findViewById(R.id.Latitude);
+        lonEdit = (EditText) findViewById(R.id.Longitude);
+        arrivalDateEdit = (EditText) findViewById(R.id.Arrival_Date);
+        departureDateEdit = (EditText) findViewById(R.id.Departure_Date);
+        travelTypeEdit = (EditText) findViewById(R.id.Travel_type);
+        travelNumberEdit = (EditText) findViewById(R.id.Travel_number);
+        travelUrlEdit = (EditText) findViewById(R.id.Travel_url);
+        lodgingNumberEdit = (EditText) findViewById(R.id.Lodging_number);
+        lodgingUrlEdit = (EditText) findViewById(R.id.Lodging_url);
 
         tripDatabaseHelper = new TripDatabaseHelper(this);
 
@@ -92,13 +106,30 @@ public class DestinationEditor extends AppCompatActivity {
     }
 
     public void doSave(){
-        EditText cityEdit = (EditText) findViewById(R.id.City);
-        EditText latEdit = (EditText) findViewById(R.id.Latitude);
-        EditText lonEdit = (EditText) findViewById(R.id.Longitude);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        Date arrivalDate = new Date();
+        Date departureDate = new Date();
+
+        try{
+            arrivalDate = dateFormat.parse(arrivalDateEdit.getText().toString());
+            departureDate = dateFormat.parse(departureDateEdit.getText().toString());
+        }catch (ParseException e){
+            Toast toast = Toast.makeText(this, "Could parse date, current date used", Toast.LENGTH_SHORT);
+            toast.show();
+        }
 
         destination.setCity(cityEdit.getText().toString());
+        destination.setState(stateEdit.getText().toString());
+        destination.setCountry(countryEdit.getText().toString());
         destination.setLat(Double.parseDouble(latEdit.getText().toString()));
         destination.setLon(Double.parseDouble(lonEdit.getText().toString()));
+        destination.setArrivalDate(arrivalDate);
+        destination.setDepartureDate(departureDate);
+        destination.setTravelType(travelTypeEdit.getText().toString());
+        destination.setTravelNumber(Integer.parseInt(travelNumberEdit.getText().toString()));
+        destination.setTravelUrl(travelUrlEdit.getText().toString());
+        destination.setLodgingNumber(Integer.parseInt(lodgingNumberEdit.getText().toString()));
+        destination.setLodgingUrl(lodgingUrlEdit.getText().toString());
 
         tripDatabaseHelper.updateDestination(destination);
     }
